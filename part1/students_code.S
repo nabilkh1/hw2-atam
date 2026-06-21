@@ -60,6 +60,7 @@ sum_of_text:
       call text_to_number
       cmp $-1, %eax
       je close_file
+      cltq
       add %rax, %r13
       jmp close_file
 
@@ -69,6 +70,7 @@ sum_of_text:
       call text_to_number
       cmp $-1, %eax
       je not_a_number
+      cltq
       add %rax, %r13
 
     not_a_number:
