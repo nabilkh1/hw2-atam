@@ -81,11 +81,11 @@ sum_of_text:
       syscall
 
 end:
+   mov %r13, %rax # move the sum into rax for the return value 
    add $64, %rsp
    pop %r15
    pop %r14
    pop %r13
-   pop %r12
-   mov %r13, %rax # move the sum into rax for the return value        
+   pop %r12        
    pop %rbp   
    ret
