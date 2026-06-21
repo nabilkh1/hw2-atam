@@ -9,7 +9,7 @@ sum_of_text:
     movq %rsp, %rbp
     push %rbx # save rbx on the stack
     sub $64, %rsp
-    xor %r10, %r10 # initialize the sum to 0
+    xor %r10, %r10 
     movq %rdi, %r10 # save the separator character in r10
     push %r10 # save the separator character on the stack
     call get_path
@@ -54,22 +54,26 @@ sum_of_text:
       jmp loop
 
     finish_file:
-      movb $0, 1(%rsp,%rbx,1)
+      movb $0, (%rsp,%rbx,1)
       movq %rsp, %rdi
+      push %r9
       call text_to_number
+      pop %r9
       cmp $-1, %rax
       je not_a_number
       add %rax, %r9
       jmp end
 
     finish_word:
-      movb $0, 1(%rsp,%rbx,1)
+      movb $0, (%rsp,%rbx,1)
       movq %rsp, %rdi
-      push %rbx # save the offset for the next word
+      push %r10
+      push %r9
       push %r8 # save the file descriptor for the next read
       call text_to_number
-      pop %r8 # restore the file descriptor
-      pop %rbx # restore the offset for the next word
+      pop %r8
+      pop %r9
+      pop %r10 # restore the file descriptor
       cmp $-1, %rax
       je not_a_number
       add %rax, %r9
