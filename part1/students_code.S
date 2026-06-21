@@ -53,7 +53,7 @@ sum_of_text:
       jmp loop
 
     finish_file:
-      movb '\0', 1(%rsp,%rcx,1)
+      movb $0, 1(%rsp,%rcx,1)
       movq %rsp, %rdi
       call text_to_number
       cmp $-1, %rax
@@ -62,7 +62,7 @@ sum_of_text:
       jmp end
 
     finish_word:
-      movb '\0', 1(%rsp,%rcx,1)
+      movb $0, 1(%rsp,%rcx,1)
       movq %rsp, %rdi
       push %rcx # save the offset for the next word
       push %r8 # save the file descriptor for the next read
