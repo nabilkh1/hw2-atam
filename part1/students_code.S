@@ -58,7 +58,7 @@ sum_of_text:
       movb $0, (%rsp,%r15,1)
       movq %rsp, %rdi
       call text_to_number
-      cmp $-1, %rax
+      cmp $-1, %eax
       je close_file
       add %rax, %r13
       jmp close_file
@@ -67,7 +67,7 @@ sum_of_text:
       movb $0, (%rsp,%r15,1)
       movq %rsp, %rdi
       call text_to_number
-      cmp $-1, %rax
+      cmp $-1, %eax
       je not_a_number
       add %rax, %r13
 
