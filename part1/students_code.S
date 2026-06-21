@@ -7,6 +7,7 @@
 sum_of_text:
     pushq %rbp
     movq %rsp, %rbp
+    push %rbx # save rbx on the stack
     sub $64, %rsp
     xor %r10, %r10 # initialize the sum to 0
     movq %rdi, %r10 # save the separator character in r10
@@ -28,11 +29,11 @@ sum_of_text:
 
 
     # read the file
-    xor %rcx, %rcx # offset for the buffer
+    xor %rbx, %rbx # offset for the buffer
     loop:
       movq %r8, %rdi
       movq $0, %rax
-      lea (%rsp,%rcx,1), %rsi # read into the bottom of the stack
+      lea (%rsp,%rbx,1), %rsi # read into the bottom of the stack
       movq $1, %rdx
       syscall
       
@@ -41,7 +42,7 @@ sum_of_text:
       je finish_file
 
       # check if we reached the end of the line
-      movb (%rsp,%rcx,1), %al
+      movb (%rsp,%rbx,1), %al
       cmpb $'\n', %al
       je finish_word
 
@@ -49,11 +50,11 @@ sum_of_text:
       cmpb %r10b, %al
       je finish_word
 
-      add $1, %rcx
+      add $1, %rbx # increment the offset
       jmp loop
 
     finish_file:
-      movb $0, 1(%rsp,%rcx,1)
+      movb $0, 1(%rsp,%rbx,1)
       movq %rsp, %rdi
       call text_to_number
       cmp $-1, %rax
@@ -62,24 +63,25 @@ sum_of_text:
       jmp end
 
     finish_word:
-      movb $0, 1(%rsp,%rcx,1)
+      movb $0, 1(%rsp,%rbx,1)
       movq %rsp, %rdi
-      push %rcx # save the offset for the next word
+      push %rbx # save the offset for the next word
       push %r8 # save the file descriptor for the next read
       call text_to_number
       pop %r8 # restore the file descriptor
-      pop %rcx # restore the offset for the next word
+      pop %rbx # restore the offset for the next word
       cmp $-1, %rax
       je not_a_number
       add %rax, %r9
-      xor %rcx, %rcx
+      xor %rbx, %rbx
       jmp loop
 
     not_a_number:
-      xor %rcx, %rcx
+      xor %rbx, %rbx # reset the offset for the next word
       jmp loop
 
 end:
+   pop %rbx # restore rbx from the stack
    mov %r9, %rax # move the sum into rax for the return value
    leave            
    ret
