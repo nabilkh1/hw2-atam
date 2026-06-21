@@ -66,7 +66,7 @@ sum_of_text:
       movb $0, (%rsp,%r15,1)
       movq %rsp, %rdi
       call text_to_number
-      cmpq $(-1), %rax
+      cmpq $-1, %rax
       je not_a_number
       add %rax, %r13
 
