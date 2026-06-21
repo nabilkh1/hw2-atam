@@ -59,9 +59,9 @@ sum_of_text:
       movq %rsp, %rdi
       call text_to_number
       cmp $-1, %rax
-      je not_a_number
+      je close_file
       add %rax, %r13
-      jmp end
+      jmp close_file
 
     finish_word:
       movb $0, (%rsp,%r15,1)
@@ -70,12 +70,15 @@ sum_of_text:
       cmp $-1, %rax
       je not_a_number
       add %rax, %r13
-      xor %r15, %r15
-      jmp loop
 
     not_a_number:
       xor %r15, %r15 # reset the offset for the next word
       jmp loop
+
+    close_file:
+      movq %r12, %rdi
+      movq $3, %rax
+      syscall
 
 end:
    add $64, %rsp
