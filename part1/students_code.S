@@ -12,15 +12,8 @@ sum_of_text:
     push %r15
     sub $64, %rsp
     
-    # =========================================================================
-    # FIX: Save the separator safely to the stack before calling get_path.
-    # If your C test passes it as a character (e.g., sum_of_text(..., '-')), use:
+    # 1. Separator passed by value in %dil. Save it safely to the stack!
     movb %dil, 56(%rsp)     
-    
-    # IF your C test passes it as a string pointer (e.g., sum_of_text(..., "-")), 
-    # uncomment the line below instead:
-    # movb (%rdi), %al; movb %al, 56(%rsp)
-    # =========================================================================
 
     call get_path
 
@@ -33,7 +26,6 @@ sum_of_text:
     syscall
 
     # Save the file descriptor in r12
-    xor %r12, %r12
     movq %rax, %r12
 
     # Read the file
@@ -55,7 +47,7 @@ loop:
     cmpb $'\n', %al
     je finish_word
 
-    # FIX: Compare against the safely preserved stack byte
+    # Check if we reached the separator securely from the stack
     cmpb 56(%rsp), %al
     je finish_word
 
@@ -91,7 +83,10 @@ close_file:
     syscall
 
 end:
-    mov %r13, %rax          # Move the sum into rax for the return value 
+    # 2. Return unsigned short. 
+    # Zero-extend the 16-bit sum (%r13w) into the 64-bit return register (%rax).
+    movzwq %r13w, %rax      
+    
     add $64, %rsp
     pop %r15
     pop %r14
